@@ -21,6 +21,7 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
+import com.hoho.android.usbserial.driver.CdcAcmSerialDriver;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -129,6 +130,7 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
             return;
         }
 
+        // UsbSerialDriver driver = new CdcAcmSerialDriver(device);
         UsbSerialDriver driver = UsbSerialProber.getDefaultProber().probeDevice(device);
         if (driver == null) {
             promise.reject(CODE_DRIVER_NOT_FOND, "no driver for device");
@@ -139,8 +141,10 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
             return;
         }
 
+        // UsbDeviceConnection connection = usbManager.openDevice(device);
         UsbDeviceConnection connection = usbManager.openDevice(driver.getDevice());
         if(connection == null) {
+            // if (!usbManager.hasPermission(device)) {
             if (!usbManager.hasPermission(driver.getDevice())) {
                 promise.reject(CODE_PERMISSION_DENIED, "connection failed: permission denied");
             } else {
