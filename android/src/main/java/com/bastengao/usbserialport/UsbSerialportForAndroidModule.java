@@ -223,6 +223,9 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
     }
 
     public static byte[] hexStringToByteArray(String s) {
+        if (s.length() % 2 == 1) {
+            throw new IllegalArgumentException("Invalid hexadecimal string");
+        }
         int len = s.length();
         byte[] data = new byte[len / 2];
         for (int i = 0; i < len; i += 2) {
