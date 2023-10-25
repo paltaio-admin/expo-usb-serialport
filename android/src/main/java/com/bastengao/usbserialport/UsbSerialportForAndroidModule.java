@@ -116,6 +116,12 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
         return;
     }
 
+    public static UsbSerialProber getCustomProber() {
+        ProbeTable customTable = new ProbeTable();
+        customTable.addProduct(0x248a, 0x8002, CdcAcmSerialDriver.class);
+        return new UsbSerialProber(customTable);
+    }
+
     @ReactMethod
     public void open(int deviceId, int baudRate, int dataBits, int stopBits, int parity, Promise promise) {
         UsbSerialPortWrapper wrapper = usbSerialPorts.get(deviceId);
@@ -129,12 +135,6 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
         if (device == null) {
             promise.reject(CODE_DEVICE_NOT_FOND, "device not found");
             return;
-        }
-
-        static UsbSerialProber getCustomProber() {
-            ProbeTable customTable = new ProbeTable();
-            customTable.addProduct(0x248a, 0x8002, CdcAcmSerialDriver.class);
-            return new UsbSerialProber(customTable);
         }
 
         UsbSerialDriver driver = UsbSerialProber.getDefaultProber().probeDevice(device);
