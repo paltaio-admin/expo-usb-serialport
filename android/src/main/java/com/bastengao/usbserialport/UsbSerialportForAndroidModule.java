@@ -130,8 +130,8 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
             return;
         }
 
-        // UsbSerialDriver driver = new CdcAcmSerialDriver(device);
-        UsbSerialDriver driver = UsbSerialProber.getDefaultProber().probeDevice(device);
+        UsbSerialDriver driver = new CdcAcmSerialDriver(device);
+        //UsbSerialDriver driver = UsbSerialProber.getDefaultProber().probeDevice(device);
         if (driver == null) {
             promise.reject(CODE_DRIVER_NOT_FOND, "no driver for device");
             return;
@@ -141,11 +141,11 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
             return;
         }
 
-        // UsbDeviceConnection connection = usbManager.openDevice(device);
-        UsbDeviceConnection connection = usbManager.openDevice(driver.getDevice());
+        UsbDeviceConnection connection = usbManager.openDevice(device);
+        //UsbDeviceConnection connection = usbManager.openDevice(driver.getDevice());
         if(connection == null) {
-            // if (!usbManager.hasPermission(device)) {
-            if (!usbManager.hasPermission(driver.getDevice())) {
+            if (!usbManager.hasPermission(device)) {
+            //if (!usbManager.hasPermission(driver.getDevice())) {
                 promise.reject(CODE_PERMISSION_DENIED, "connection failed: permission denied");
             } else {
                 promise.reject(CODE_OPEN_FAILED, "connection failed: open failed");
