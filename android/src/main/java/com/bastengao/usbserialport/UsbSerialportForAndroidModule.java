@@ -188,7 +188,7 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
             } else {
                 promise.reject(CODE_SEND_FAILED, "send failed", exception);
             }
-        })
+        });
     }
 
     @ReactMethod
@@ -210,7 +210,7 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
             } else {
                 promise.reject(CODE_SEND_FAILED, "send failed", exception);
             }
-        })
+        });
     }
 
     @ReactMethod
