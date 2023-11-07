@@ -47,7 +47,7 @@ public class UsbSerialPortWrapper implements SerialInputOutputManager.Listener {
 
     public void read(int bytes, Promise promise) throws IOException {
         if (bytes <= 0) {
-            promise.reject("read_failed", "read failed", "expected bytes must be greater than 0");
+            promise.reject("read_failed", "expected bytes must be greater than 0");
             return;
         }
         try {
@@ -58,7 +58,7 @@ public class UsbSerialPortWrapper implements SerialInputOutputManager.Listener {
                 String hex = UsbSerialportForAndroidModule.bytesToHex(data);
                 promise.resolve(hex);
             } else {
-                promise.reject("read_failed", "read failed", "no response from device");
+                promise.reject("read_failed", "no response from device");
             }   
         } catch (IOException e) {
             promise.reject("read_failed", "read failed", e);
