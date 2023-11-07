@@ -25,6 +25,7 @@ interface UsbSerialportForAndroidAPI {
     parity: number
   ): Promise<number>;
   send(deviceId: number, hexStr: string): Promise<null>;
+  sendWithResponse(deviceId: number, hexStr: string, bytes: number): Promise<null>;
   close(deviceId: number): Promise<null>;
 }
 

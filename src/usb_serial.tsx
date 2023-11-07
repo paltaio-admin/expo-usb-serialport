@@ -39,6 +39,22 @@ export default class UsbSerial {
   }
 
   /**
+   * Send data with hex string & wait for a response
+   *
+   * May return error with these codes:
+   * * DEVICE_NOT_OPEN
+   * * SEND_FAILED
+   * * READ_FAILED
+   *
+   * See {@link Codes}
+   * @param hexStr
+   * @returns
+   */
+  sendWithResponse(hexStr: string, bytes: number): Promise<null> {
+    return UsbSerialportForAndroid.sendWithResponse(this.deviceId, hexStr, bytes);
+  }
+
+  /**
    * Listen to data received event.
    *
    * @param listener
