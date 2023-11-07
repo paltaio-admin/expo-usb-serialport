@@ -45,7 +45,7 @@ public class UsbSerialPortWrapper implements SerialInputOutputManager.Listener {
         }
     }
 
-    public void read(int bytes, Promise promise) throws IOException {
+    public void read(int bytes, Promise promise) {
         if (bytes <= 0) {
             promise.reject("read_failed", "expected bytes must be greater than 0");
             return;
