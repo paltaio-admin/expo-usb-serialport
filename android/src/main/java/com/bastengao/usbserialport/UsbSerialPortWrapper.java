@@ -41,23 +41,27 @@ public class UsbSerialPortWrapper implements SerialInputOutputManager.Listener {
             this.port.write(data, WRITE_WAIT_MILLIS);
             callback.onComplete(null);
         } catch (IOException e) {
-            callback.onComplete(e.getMessage());
+            callback.onComplete(e);
         }
     }
 
     public void read(int bytes, Promise promise) throws IOException {
         if (bytes <= 0) {
-            promise.reject(CODE_READ_FAILED, "read failed", "expected bytes must be greater than 0");
+            promise.reject("read_failed", "read failed", "expected bytes must be greater than 0");
             return;
         }
-        byte[] buffer = new byte[bytes];
-        int read = this.port.read(buffer, READ_WAIT_MILLIS);
-        if (read > 0) {
-            byte[] data = Arrays.copyOf(buffer, read);
-            String hex = UsbSerialportForAndroidModule.bytesToHex(data);
-            promise.resolve(hex);
-        } else {
-            promise.reject(CODE_READ_FAILED, "read failed", "no response from device");
+        try {
+            byte[] buffer = new byte[bytes];
+            int read = this.port.read(buffer, READ_WAIT_MILLIS);
+            if (read > 0) {
+                byte[] data = Arrays.copyOf(buffer, read);
+                String hex = UsbSerialportForAndroidModule.bytesToHex(data);
+                promise.resolve(hex);
+            } else {
+                promise.reject("read_failed", "read failed", "no response from device");
+            }   
+        } catch (IOException e) {
+            promise.reject("read_failed", "read failed", e);
         }
     }
 

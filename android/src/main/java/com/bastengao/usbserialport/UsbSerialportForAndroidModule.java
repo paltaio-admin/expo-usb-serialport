@@ -202,11 +202,7 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
         byte[] data = hexStringToByteArray(hexStr);
         wrapper.send(data, exception -> {
             if (exception == null) {
-                try {
-                    wrapper.read(bytes, promise);
-                } catch (IOException e) {
-                    promise.reject(CODE_READ_FAILED, "read failed", e);
-                }
+                wrapper.read(bytes, promise);
             } else {
                 promise.reject(CODE_SEND_FAILED, "send failed", exception);
             }
