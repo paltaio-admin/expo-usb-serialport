@@ -12,8 +12,10 @@ import java.io.IOException;
 import java.util.Arrays;
 
 public class UsbSerialPortWrapper implements SerialInputOutputManager.Listener {
+
     private static final int WRITE_WAIT_MILLIS = 2000;
     private static final int READ_WAIT_MILLIS = 2000;
+
     private static final String DataReceivedEvent = "usbSerialPortDataReceived";
 
     private int deviceId;
@@ -30,8 +32,33 @@ public class UsbSerialPortWrapper implements SerialInputOutputManager.Listener {
         ioManager.start();
     }
 
-    public void send(byte[] data) throws IOException {
-        this.port.write(data, WRITE_WAIT_MILLIS);
+    public interface EventCallback {
+        void onComplete(Exception e);
+    }
+
+    public void send(byte[] data, EventCallback callback) {
+        try {
+            this.port.write(data, WRITE_WAIT_MILLIS);
+            callback.onComplete(null);
+        } catch (IOException e) {
+            callback.onComplete(e.getMessage());
+        }
+    }
+
+    public void read(int bytes, Promise promise) throws IOException {
+        if (bytes <= 0) {
+            promise.reject(CODE_READ_FAILED, "read failed", "expected bytes must be greater than 0");
+            return;
+        }
+        byte[] buffer = new byte[bytes];
+        int read = this.port.read(buffer, READ_WAIT_MILLIS);
+        if (read > 0) {
+            byte[] data = Arrays.copyOf(buffer, read);
+            String hex = UsbSerialportForAndroidModule.bytesToHex(data);
+            promise.resolve(hex);
+        } else {
+            promise.reject(CODE_READ_FAILED, "read failed", "no response from device");
+        }
     }
 
     public void onNewData(byte[] data) {

@@ -40,6 +40,7 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
     public static final String CODE_OPEN_FAILED = "open_failed";
     public static final String CODE_DEVICE_NOT_OPEN = "device_not_open";
     public static final String CODE_SEND_FAILED = "send_failed";
+    public static final String CODE_READ_FAILED = "read_failed";
     public static final String CODE_DEVICE_NOT_OPEN_OR_CLOSED = "device_not_open_or_closed";
 
     private final ReactApplicationContext reactContext;
@@ -66,6 +67,7 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
         constants.put("CODE_OPEN_FAILED", CODE_OPEN_FAILED);
         constants.put("CODE_DEVICE_NOT_OPEN", CODE_DEVICE_NOT_OPEN);
         constants.put("CODE_SEND_FAILED", CODE_SEND_FAILED);
+        constants.put("CODE_READ_FAILED", CODE_READ_FAILED);
         constants.put("CODE_DEVICE_NOT_OPEN_OR_CLOSED", CODE_DEVICE_NOT_OPEN_OR_CLOSED);
         return constants;
     }
@@ -180,13 +182,35 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
         }
 
         byte[] data = hexStringToByteArray(hexStr);
-        try {
-            wrapper.send(data);
-            promise.resolve(null);
-        } catch (IOException e) {
-            promise.reject(CODE_SEND_FAILED, "send failed", e);
+        wrapper.send(data, exception -> {
+            if (exception == null) {
+                promise.resolve(null);
+            } else {
+                promise.reject(CODE_SEND_FAILED, "send failed", exception);
+            }
+        })
+    }
+
+    @ReactMethod
+    public void sendWithResponse(int deviceId, String hexStr, int bytes, Promise promise) {
+        UsbSerialPortWrapper wrapper = usbSerialPorts.get(deviceId);
+        if (wrapper == null) {
+            promise.reject(CODE_DEVICE_NOT_OPEN, "device not open");
             return;
         }
+
+        byte[] data = hexStringToByteArray(hexStr);
+        wrapper.send(data, exception -> {
+            if (exception == null) {
+                try {
+                    wrapper.read(bytes, promise);
+                } catch (IOException e) {
+                    promise.reject(CODE_READ_FAILED, "read failed", e);
+                }
+            } else {
+                promise.reject(CODE_SEND_FAILED, "send failed", exception);
+            }
+        })
     }
 
     @ReactMethod
