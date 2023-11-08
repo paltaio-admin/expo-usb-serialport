@@ -1,8 +1,10 @@
 package com.bastengao.usbserialport;
 
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
@@ -100,9 +102,24 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
             return;
         }
 
+        BroadcastReceiver usbPermissionReceiver = new BroadcastReceiver() {
+            public void onReceive(Context context, Intent intent) {
+                getCurrentActivity().unregisterReceiver(this);
+
+                boolean permissionGranted = intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false);
+                if (permissionGranted) {
+                    promise.resolve(1);
+                } else {
+                    promise.reject(CODE_PERMISSION_DENIED, "permission denied");
+                }
+            }
+        };
+
+        IntentFilter filter = new IntentFilter(INTENT_ACTION_GRANT_USB);
+        getCurrentActivity().registerReceiver(usbPermissionReceiver, filter);
+
         PendingIntent usbPermissionIntent = PendingIntent.getBroadcast(getCurrentActivity(), 0, new Intent(INTENT_ACTION_GRANT_USB), PendingIntent.FLAG_MUTABLE);
         usbManager.requestPermission(device, usbPermissionIntent);
-        promise.resolve(0);
     }
 
     @ReactMethod
