@@ -1,10 +1,4 @@
-import { NativeModules, Platform } from 'react-native';
-
-const LINKING_ERROR =
-  `The package 'react-native-usb-serialport-for-android' doesn't seem to be linked. Make sure: \n\n` +
-  Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
-  '- You rebuilt the app after installing the package\n' +
-  '- You are not using Expo managed workflow\n';
+import { NativeModules } from 'react-native';
 
 export interface Device {
   readonly deviceId: number;
@@ -25,20 +19,15 @@ interface UsbSerialportForAndroidAPI {
     parity: number
   ): Promise<number>;
   send(deviceId: number, hexStr: string): Promise<null>;
-  sendWithResponse(deviceId: number, hexStr: string, bytes: number): Promise<null>;
+  sendWithResponse(
+    deviceId: number,
+    hexStr: string,
+    bytes: number
+  ): Promise<null>;
   close(deviceId: number): Promise<null>;
 }
 
 const UsbSerialportForAndroid: UsbSerialportForAndroidAPI =
-  NativeModules.UsbSerialportForAndroid
-    ? NativeModules.UsbSerialportForAndroid
-    : new Proxy(
-        {},
-        {
-          get() {
-            throw new Error(LINKING_ERROR);
-          },
-        }
-      );
+  NativeModules.UsbSerialportForAndroid;
 
 export default UsbSerialportForAndroid;
