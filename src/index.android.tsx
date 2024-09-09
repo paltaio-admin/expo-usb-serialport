@@ -4,6 +4,7 @@ import UsbSerial from './usb_serial'
 import type { Parity } from './constants'
 
 export { Device, UsbSerial }
+export { Codes, DataReceivedEvent, Parity } from './constants'
 export { EventData, Listener } from './usb_serial'
 
 const eventEmitter = new NativeEventEmitter(
