@@ -18,7 +18,7 @@ def safeExtGet(prop, fallback) {
 }
 
 android {
-    namespace = "io.palta.expousbseriaport"
+    namespace = "io.palta.expousbserialport"
     compileSdkVersion safeExtGet('UsbSerialportForAndroid_compileSdkVersion', 34)
     defaultConfig {
         minSdkVersion safeExtGet('UsbSerialportForAndroid_minSdkVersion', 21)

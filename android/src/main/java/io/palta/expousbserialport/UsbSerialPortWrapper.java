@@ -1,4 +1,4 @@
-package io.palta.expousbseriaport;
+package io.palta.expousbserialport;
 
 import android.util.Log;
 

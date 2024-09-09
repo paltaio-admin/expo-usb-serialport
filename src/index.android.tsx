@@ -24,7 +24,7 @@ export interface Manager {
    * Return true if already has permission, otherwise will request permission and return false.
    *
    * May return error with these codes:
-   * DEVICE_NOT_FOND
+   * DEVICE_NOT_FOUND
    *
    * See {@link Codes}
    * @param deviceId
@@ -32,7 +32,7 @@ export interface Manager {
   tryRequestPermission: (deviceId: number) => Promise<boolean>
   /**
    * May return error with these codes:
-   * DEVICE_NOT_FOND
+   * DEVICE_NOT_FOUND
    *
    * See {@link Codes}
    * @param deviceId
@@ -40,8 +40,8 @@ export interface Manager {
   hasPermission: (deviceId: number) => Promise<boolean>
   /**
    * May return error with these codes:
-   * DEVICE_NOT_FOND
-   * DRIVER_NOT_FOND
+   * DEVICE_NOT_FOUND
+   * DRIVER_NOT_FOUND
    * NOT_ENOUGH_PORTS
    * PERMISSION_DENIED
    * OPEN_FAILED

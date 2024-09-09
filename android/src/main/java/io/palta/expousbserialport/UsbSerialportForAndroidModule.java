@@ -1,4 +1,4 @@
-package io.palta.expousbseriaport;
+package io.palta.expousbserialport;
 
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -36,8 +36,8 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
     public static final String NAME = "UsbSerialportForAndroid";
     private static final String INTENT_ACTION_GRANT_USB = BuildConfig.LIBRARY_PACKAGE_NAME + ".GRANT_USB";
 
-    public static final String CODE_DEVICE_NOT_FOND = "device_not_found";
-    public static final String CODE_DRIVER_NOT_FOND = "driver_not_found";
+    public static final String CODE_DEVICE_NOT_FOUND = "device_not_found";
+    public static final String CODE_DRIVER_NOT_FOUND = "driver_not_found";
     public static final String CODE_NOT_ENOUGH_PORTS = "not_enough_ports";
     public static final String CODE_PERMISSION_DENIED = "permission_denied";
     public static final String CODE_OPEN_FAILED = "open_failed";
@@ -63,8 +63,8 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
     @Override
     public Map<String, Object> getConstants() {
         final Map<String, Object> constants = new HashMap<>();
-        constants.put("CODE_DEVICE_NOT_FOND", CODE_DEVICE_NOT_FOND);
-        constants.put("CODE_DRIVER_NOT_FOND", CODE_DRIVER_NOT_FOND);
+        constants.put("CODE_DEVICE_NOT_FOUND", CODE_DEVICE_NOT_FOUND);
+        constants.put("CODE_DRIVER_NOT_FOUND", CODE_DRIVER_NOT_FOUND);
         constants.put("CODE_NOT_ENOUGH_PORTS", CODE_NOT_ENOUGH_PORTS);
         constants.put("CODE_PERMISSION_DENIED", CODE_PERMISSION_DENIED);
         constants.put("CODE_OPEN_FAILED", CODE_OPEN_FAILED);
@@ -94,7 +94,7 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
         UsbManager usbManager = (UsbManager) getCurrentActivity().getSystemService(Context.USB_SERVICE);
         UsbDevice device = findDevice(deviceId);
         if (device == null) {
-            promise.reject(CODE_DEVICE_NOT_FOND, "device not found");
+            promise.reject(CODE_DEVICE_NOT_FOUND, "device not found");
             return;
         }
 
@@ -145,7 +145,7 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
         UsbManager usbManager = (UsbManager) getCurrentActivity().getSystemService(Context.USB_SERVICE);
         UsbDevice device = findDevice(deviceId);
         if (device == null) {
-            promise.reject(CODE_DEVICE_NOT_FOND, "device not found");
+            promise.reject(CODE_DEVICE_NOT_FOUND, "device not found");
             return;
         }
 
@@ -164,7 +164,7 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
         UsbManager usbManager = (UsbManager) getCurrentActivity().getSystemService(Context.USB_SERVICE);
         UsbDevice device = findDevice(deviceId);
         if (device == null) {
-            promise.reject(CODE_DEVICE_NOT_FOND, "device not found");
+            promise.reject(CODE_DEVICE_NOT_FOUND, "device not found");
             return;
         }
 
@@ -173,7 +173,7 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
             driver = CustomProber.getCustomProber().probeDevice(device);
         }
         if (driver == null) {
-            promise.reject(CODE_DRIVER_NOT_FOND, "no driver for device");
+            promise.reject(CODE_DRIVER_NOT_FOUND, "no driver for device");
             return;
         }
         if (driver.getPorts().size() < 0) {

@@ -31,7 +31,7 @@ try {
   usbSerialport.close();
 } catch(err) {
   console.log(err);
-  if (err.code === Codes.DEVICE_NOT_FOND) {
+  if (err.code === Codes.DEVICE_NOT_FOUND) {
     // ...
   }
 }
