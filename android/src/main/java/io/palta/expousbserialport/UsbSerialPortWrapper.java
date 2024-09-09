@@ -59,7 +59,7 @@ public class UsbSerialPortWrapper implements SerialInputOutputManager.Listener {
                 promise.resolve(hex);
             } else {
                 promise.reject("read_failed", "no response from device");
-            }   
+            }
         } catch (IOException e) {
             promise.reject("read_failed", "read failed", e);
         }
@@ -70,7 +70,7 @@ public class UsbSerialPortWrapper implements SerialInputOutputManager.Listener {
         String hex = UsbSerialportForAndroidModule.bytesToHex(data);
         event.putInt("deviceId", this.deviceId);
         event.putString("data", hex);
-        Log.d("usbserialport", hex);
+        Log.d("expousbserialport", hex);
         sender.sendEvent(DataReceivedEvent, event);
     }
 
