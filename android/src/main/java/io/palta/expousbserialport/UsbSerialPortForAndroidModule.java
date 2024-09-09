@@ -1,5 +1,6 @@
 package io.palta.expousbserialport;
 
+import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -12,6 +13,7 @@ import android.os.Build;
 
 import androidx.annotation.NonNull;
 
+import com.facebook.react.BuildConfig;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -24,16 +26,15 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
-import com.hoho.android.usbserial.driver.ProbeTable;
-import com.hoho.android.usbserial.driver.CdcAcmSerialDriver;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
-@ReactModule(name = UsbSerialportForAndroidModule.NAME)
-public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule implements EventSender {
-    public static final String NAME = "UsbSerialportForAndroid";
+@ReactModule(name = UsbSerialPortForAndroidModule.NAME)
+public class UsbSerialPortForAndroidModule extends ReactContextBaseJavaModule implements EventSender {
+    public static final String NAME = "UsbSerialPortForAndroid";
     private static final String INTENT_ACTION_GRANT_USB = BuildConfig.LIBRARY_PACKAGE_NAME + ".GRANT_USB";
 
     public static final String CODE_DEVICE_NOT_FOUND = "device_not_found";
@@ -49,7 +50,9 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
     private final ReactApplicationContext reactContext;
     private final Map<Integer, UsbSerialPortWrapper> usbSerialPorts = new HashMap<Integer, UsbSerialPortWrapper>();
 
-    public UsbSerialportForAndroidModule(ReactApplicationContext reactContext) {
+    public final CustomProber customProber = new CustomProber();
+
+    public UsbSerialPortForAndroidModule(ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
     }
@@ -78,7 +81,8 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
     @ReactMethod
     public void list(Promise promise) {
         WritableArray devices = Arguments.createArray();
-        UsbManager usbManager = (UsbManager) getCurrentActivity().getSystemService(Context.USB_SERVICE);
+        UsbManager usbManager = (UsbManager) Objects.requireNonNull(getCurrentActivity()).getSystemService(Context.USB_SERVICE);
+
         for (UsbDevice device : usbManager.getDeviceList().values()) {
             WritableMap d = Arguments.createMap();
             d.putInt("deviceId", device.getDeviceId());
@@ -89,9 +93,11 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
         promise.resolve(devices);
     }
 
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     @ReactMethod
     public void tryRequestPermission(int deviceId, Promise promise) {
-        UsbManager usbManager = (UsbManager) getCurrentActivity().getSystemService(Context.USB_SERVICE);
+        UsbManager usbManager = (UsbManager) Objects.requireNonNull(getCurrentActivity()).getSystemService(Context.USB_SERVICE);
+
         UsbDevice device = findDevice(deviceId);
         if (device == null) {
             promise.reject(CODE_DEVICE_NOT_FOUND, "device not found");
@@ -105,7 +111,7 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
 
         BroadcastReceiver usbPermissionReceiver = new BroadcastReceiver() {
             public void onReceive(Context context, Intent intent) {
-                getCurrentActivity().unregisterReceiver(this);
+                Objects.requireNonNull(getCurrentActivity()).unregisterReceiver(this);
 
                 boolean permissionGranted = intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false);
                 if (permissionGranted) {
@@ -122,15 +128,13 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
         } else {
             getCurrentActivity().registerReceiver(usbPermissionReceiver, filter);
         }
-        
+
 
         PendingIntent usbPermissionIntent;
         Intent usbIntent = new Intent(INTENT_ACTION_GRANT_USB);
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             usbPermissionIntent = PendingIntent.getBroadcast(getCurrentActivity(), 0, usbIntent, PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_ALLOW_UNSAFE_IMPLICIT_INTENT);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            usbPermissionIntent = PendingIntent.getBroadcast(getCurrentActivity(), 0, usbIntent, PendingIntent.FLAG_MUTABLE);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             usbPermissionIntent = PendingIntent.getBroadcast(getCurrentActivity(), 0, usbIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         } else {
@@ -142,7 +146,7 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
 
     @ReactMethod
     public void hasPermission(int deviceId, Promise promise) {
-        UsbManager usbManager = (UsbManager) getCurrentActivity().getSystemService(Context.USB_SERVICE);
+        UsbManager usbManager = (UsbManager) Objects.requireNonNull(getCurrentActivity()).getSystemService(Context.USB_SERVICE);
         UsbDevice device = findDevice(deviceId);
         if (device == null) {
             promise.reject(CODE_DEVICE_NOT_FOUND, "device not found");
@@ -154,6 +158,11 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
     }
 
     @ReactMethod
+    public void addDevice(int vendorId, int productId, String driverName) {
+        customProber.addProduct(vendorId, productId, driverName);
+    }
+
+    @ReactMethod
     public void open(int deviceId, int baudRate, int dataBits, int stopBits, int parity, Promise promise) {
         UsbSerialPortWrapper wrapper = usbSerialPorts.get(deviceId);
         if (wrapper != null) {
@@ -161,7 +170,7 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
             return;
         }
 
-        UsbManager usbManager = (UsbManager) getCurrentActivity().getSystemService(Context.USB_SERVICE);
+        UsbManager usbManager = (UsbManager) Objects.requireNonNull(getCurrentActivity()).getSystemService(Context.USB_SERVICE);
         UsbDevice device = findDevice(deviceId);
         if (device == null) {
             promise.reject(CODE_DEVICE_NOT_FOUND, "device not found");
@@ -170,13 +179,13 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
 
         UsbSerialDriver driver = UsbSerialProber.getDefaultProber().probeDevice(device);
         if (driver == null) {
-            driver = CustomProber.getCustomProber().probeDevice(device);
+            driver = customProber.getCustomProber().probeDevice(device);
         }
         if (driver == null) {
             promise.reject(CODE_DRIVER_NOT_FOUND, "no driver for device");
             return;
         }
-        if (driver.getPorts().size() < 0) {
+        if (driver.getPorts().isEmpty()) {
             promise.reject(CODE_NOT_ENOUGH_PORTS, "not enough ports at device");
             return;
         }
@@ -268,7 +277,7 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
     }
 
     private UsbDevice findDevice(int deviceId) {
-        UsbManager usbManager = (UsbManager) getCurrentActivity().getSystemService(Context.USB_SERVICE);
+        UsbManager usbManager = (UsbManager) Objects.requireNonNull(getCurrentActivity()).getSystemService(Context.USB_SERVICE);
         for (UsbDevice device : usbManager.getDeviceList().values()) {
             if (device.getDeviceId() == deviceId) {
                 return device;
