@@ -15,11 +15,11 @@
     "usb",
     "serialport"
   ],
-  "main": "lib/commonjs/index",
-  "module": "lib/module/index",
+  "main": "lib/commonjs/index.android",
+  "module": "lib/module/index.android",
   "types": "lib/typescript/src/index.android.d.ts",
-  "react-native": "src/index",
-  "source": "src/index",
+  "react-native": "src/index.android",
+  "source": "src/index.android",
   "files": [
     "!**/__fixtures__",
     "!**/__mocks__",
