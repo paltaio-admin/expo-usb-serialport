@@ -122,8 +122,21 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
         } else {
             getCurrentActivity().registerReceiver(usbPermissionReceiver, filter);
         }
+        
 
-        PendingIntent usbPermissionIntent = PendingIntent.getBroadcast(getCurrentActivity(), 0, new Intent(INTENT_ACTION_GRANT_USB), PendingIntent.FLAG_MUTABLE);
+        PendingIntent usbPermissionIntent;
+        Intent usbIntent = new Intent(INTENT_ACTION_GRANT_USB);
+
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            usbPermissionIntent = PendingIntent.getBroadcast(getCurrentActivity(), 0, usbIntent, PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_ALLOW_UNSAFE_IMPLICIT_INTENT);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            usbPermissionIntent = PendingIntent.getBroadcast(getCurrentActivity(), 0, usbIntent, PendingIntent.FLAG_MUTABLE);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            usbPermissionIntent = PendingIntent.getBroadcast(getCurrentActivity(), 0, usbIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        } else {
+            usbPermissionIntent = PendingIntent.getBroadcast(getCurrentActivity(), 0, usbIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        }
+
         usbManager.requestPermission(device, usbPermissionIntent);
     }
 
