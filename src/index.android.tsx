@@ -1,100 +1,69 @@
-import { NativeEventEmitter, NativeModules } from 'react-native';
-import UsbSerialportForAndroid, { Device } from './native_module';
-import UsbSerial from './usb_serial';
+import { NativeEventEmitter, NativeModules } from 'react-native'
+import UsbSerialportForAndroid, { Device } from './native_module'
+import UsbSerial from './usb_serial'
+import type { Parity } from './constants'
 
-export { Device, UsbSerial };
-export { Listener, EventData } from './usb_serial';
-
-const {
-  CODE_DEVICE_NOT_FOND,
-  CODE_DRIVER_NOT_FOND,
-  CODE_NOT_ENOUGH_PORTS,
-  CODE_PERMISSION_DENIED,
-  CODE_OPEN_FAILED,
-  CODE_DEVICE_NOT_OPEN,
-  CODE_SEND_FAILED,
-  CODE_READ_FAILED,
-  CODE_DEVICE_NOT_OPEN_OR_CLOSED,
-} = NativeModules.UsbSerialportForAndroid.getConstants();
-
-export const Codes = {
-  DEVICE_NOT_FOND: CODE_DEVICE_NOT_FOND,
-  DRIVER_NOT_FOND: CODE_DRIVER_NOT_FOND,
-  NOT_ENOUGH_PORTS: CODE_NOT_ENOUGH_PORTS,
-  PERMISSION_DENIED: CODE_PERMISSION_DENIED,
-  OPEN_FAILED: CODE_OPEN_FAILED,
-  DEVICE_NOT_OPEN: CODE_DEVICE_NOT_OPEN,
-  SEND_FAILED: CODE_SEND_FAILED,
-  READ_FAILED: CODE_READ_FAILED,
-  DEVICE_NOT_OPEN_OR_CLOSED: CODE_DEVICE_NOT_OPEN_OR_CLOSED,
-};
+export { Device, UsbSerial }
+export { EventData, Listener } from './usb_serial'
 
 const eventEmitter = new NativeEventEmitter(
-  NativeModules.UsbSerialportForAndroid
-);
-
-export enum Parity {
-  None = 0,
-  Odd,
-  Even,
-  Mark,
-  Space,
-}
+  NativeModules.UsbSerialportForAndroid,
+)
 
 export interface OpenOptions {
-  baudRate: number;
-  parity: Parity;
-  dataBits: number;
-  stopBits: number;
+  baudRate: number
+  parity: Parity
+  dataBits: number
+  stopBits: number
 }
 
 export interface Manager {
-  list(): Promise<Device[]>;
+  list: () => Promise<Device[]>
   /**
    * Return true if already has permission, otherwise will request permission and return false.
    *
    * May return error with these codes:
-   * * DEVICE_NOT_FOND
+   * DEVICE_NOT_FOND
    *
    * See {@link Codes}
    * @param deviceId
    */
-  tryRequestPermission(deviceId: number): Promise<boolean>;
+  tryRequestPermission: (deviceId: number) => Promise<boolean>
   /**
    * May return error with these codes:
-   * * DEVICE_NOT_FOND
+   * DEVICE_NOT_FOND
    *
    * See {@link Codes}
    * @param deviceId
    */
-  hasPermission(deviceId: number): Promise<boolean>;
+  hasPermission: (deviceId: number) => Promise<boolean>
   /**
    * May return error with these codes:
-   * * DEVICE_NOT_FOND
-   * * DRIVER_NOT_FOND
-   * * NOT_ENOUGH_PORTS
-   * * PERMISSION_DENIED
-   * * OPEN_FAILED
+   * DEVICE_NOT_FOND
+   * DRIVER_NOT_FOND
+   * NOT_ENOUGH_PORTS
+   * PERMISSION_DENIED
+   * OPEN_FAILED
    *
    * See {@link Codes}
    * @param deviceId
    * @param options
    */
-  open(deviceId: number, options: OpenOptions): Promise<UsbSerial>;
+  open: (deviceId: number, options: OpenOptions) => Promise<UsbSerial>
 }
 
 const defaultManager: Manager = {
   list(): Promise<Device[]> {
-    return UsbSerialportForAndroid.list();
+    return UsbSerialportForAndroid.list()
   },
 
   async tryRequestPermission(deviceId: number): Promise<boolean> {
-    const result = await UsbSerialportForAndroid.tryRequestPermission(deviceId);
-    return result === 1;
+    const result = await UsbSerialportForAndroid.tryRequestPermission(deviceId)
+    return result === 1
   },
 
   hasPermission(deviceId: number): Promise<boolean> {
-    return UsbSerialportForAndroid.hasPermission(deviceId);
+    return UsbSerialportForAndroid.hasPermission(deviceId)
   },
 
   async open(deviceId: number, options: OpenOptions): Promise<UsbSerial> {
@@ -103,10 +72,10 @@ const defaultManager: Manager = {
       options.baudRate,
       options.dataBits,
       options.stopBits,
-      options.parity
-    );
-    return new UsbSerial(deviceId, eventEmitter);
+      options.parity,
+    )
+    return new UsbSerial(deviceId, eventEmitter)
   },
-};
+}
 
-export const UsbSerialManager: Manager = defaultManager;
+export const UsbSerialManager: Manager = defaultManager

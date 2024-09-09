@@ -1,7 +1,7 @@
-import type { ConfigPlugin } from '@expo/config-plugins';
+import type { ConfigPlugin } from '@expo/config-plugins'
 
 const withUsbSerialPort: ConfigPlugin = (config) => {
-  return config;
-};
+  return config
+}
 
-export default withUsbSerialPort;
+export default withUsbSerialPort
