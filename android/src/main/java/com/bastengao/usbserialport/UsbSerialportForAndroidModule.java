@@ -1,4 +1,4 @@
-package com.bastengao.usbserialport;
+package com.paltaio.usbserialport;
 
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;

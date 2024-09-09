@@ -1,4 +1,4 @@
-package com.bastengao.usbserialport;
+package com.paltaio.usbserialport;
 
 import com.facebook.react.bridge.WritableMap;
 

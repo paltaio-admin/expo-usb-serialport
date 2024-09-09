@@ -1,4 +1,4 @@
-package com.bastengao.usbserialport;
+package com.paltaio.usbserialport;
 
 import com.hoho.android.usbserial.driver.CdcAcmSerialDriver;
 import com.hoho.android.usbserial.driver.ProbeTable;

@@ -1,7 +1,7 @@
 {
-  "name": "react-native-usb-serialport-for-android",
+  "name": "@paltaio/expo-usb-serialport",
   "version": "0.4.1",
-  "description": "react-native-usb-serialport-for-android",
+  "description": "expo-usb-serialport",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
   "types": "lib/typescript/index.d.ts",
@@ -36,13 +36,13 @@
     "usb",
     "serialport"
   ],
-  "repository": "https://github.com/bastengao/react-native-usb-serialport-for-android",
-  "author": "bastengao <bastengao@gmail.com> (https://github.com/bastengao)",
+  "repository": "https://github.com/paltaio/expo-usb-serialport",
+  "author": "Palta.io <github@mail.palta.io> (https://github.com/paltaio)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/bastengao/react-native-usb-serialport-for-android/issues"
+    "url": "https://github.com/paltaio/expo-usb-serialport/issues"
   },
-  "homepage": "https://github.com/bastengao/react-native-usb-serialport-for-android#readme",
+  "homepage": "https://github.com/paltaio/expo-usb-serialport#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
