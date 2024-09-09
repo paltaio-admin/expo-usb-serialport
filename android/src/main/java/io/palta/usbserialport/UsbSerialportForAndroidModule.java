@@ -1,4 +1,4 @@
-package com.paltaio.usbserialport;
+package io.palta.expousbseriaport;
 
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;

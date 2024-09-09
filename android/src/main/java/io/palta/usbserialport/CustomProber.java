@@ -1,4 +1,4 @@
-package com.paltaio.usbserialport;
+package io.palta.expousbseriaport;
 
 import com.hoho.android.usbserial.driver.CdcAcmSerialDriver;
 import com.hoho.android.usbserial.driver.FtdiSerialDriver;
