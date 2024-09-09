@@ -51,7 +51,11 @@ export default class UsbSerial {
    * @returns
    */
   sendWithResponse(hexStr: string, bytes: number): Promise<null> {
-    return UsbSerialportForAndroid.sendWithResponse(this.deviceId, hexStr, bytes);
+    return UsbSerialportForAndroid.sendWithResponse(
+      this.deviceId,
+      hexStr,
+      bytes
+    );
   }
 
   /**

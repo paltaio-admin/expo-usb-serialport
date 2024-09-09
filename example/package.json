@@ -1,6 +1,6 @@
 {
-  "name": "react-native-usb-serialport-for-android-example",
-  "description": "Example app for react-native-usb-serialport-for-android",
+  "name": "expo-usb-serialport-example",
+  "description": "Example app for expo-usb-serialport",
   "version": "0.0.1",
   "private": true,
   "scripts": {

@@ -1,17 +1,17 @@
-# react-native-usb-serialport-for-android
+# expo-usb-serialport
 
 React Native USB serialport module for Android platform based on [mik3y/usb-serial-for-android](https://github.com/mik3y/usb-serial-for-android)
 
 ## Installation
 
 ```sh
-npm install react-native-usb-serialport-for-android --save
+pnpm add @paltaio/expo-usb-serialport
 ```
 
 ## Usage
 
 ```js
-import { UsbSerialManager, Parity, Codes } from "react-native-usb-serialport-for-android";
+import { UsbSerialManager, Parity, Codes } from "@paltaio/expo-usb-serialport";
 
 // ...
 const devices = await UsbSerialManager.list();

@@ -1,4 +1,4 @@
-import { NativeEventEmitter, NativeModules, Platform } from 'react-native';
+import { NativeEventEmitter, NativeModules } from 'react-native';
 import UsbSerialportForAndroid, { Device } from './native_module';
 import UsbSerial from './usb_serial';
 
@@ -33,19 +33,19 @@ const eventEmitter = new NativeEventEmitter(
   NativeModules.UsbSerialportForAndroid
 );
 
-export interface OpenOptions {
-  baudRate: number;
-  parity: Parity;
-  dataBits: number;
-  stopBits: number;
-}
-
 export enum Parity {
   None = 0,
   Odd,
   Even,
   Mark,
   Space,
+}
+
+export interface OpenOptions {
+  baudRate: number;
+  parity: Parity;
+  dataBits: number;
+  stopBits: number;
 }
 
 export interface Manager {
@@ -109,16 +109,4 @@ const defaultManager: Manager = {
   },
 };
 
-export const UsbSerialManager: Manager =
-  Platform.OS === 'android'
-    ? defaultManager
-    : (new Proxy(
-        {},
-        {
-          get() {
-            return () => {
-              throw new Error(`Not support ${Platform.OS}`);
-            };
-          },
-        }
-      ) as Manager);
+export const UsbSerialManager: Manager = defaultManager;
