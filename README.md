@@ -18,17 +18,17 @@ const devices = await UsbSerialManager.list();
 
 try {
   await UsbSerialManager.tryRequestPermission(2004);
-  const usbSerialport = await UsbSerialManager.open(2004, { baudRate: 38400, parity: Parity.None, dataBits: 8, stopBits: 1 });
+  const usbSerialPort = await UsbSerialManager.open(2004, { baudRate: 38400, parity: Parity.None, dataBits: 8, stopBits: 1 });
 
-  const sub = usbSerialport.onReceived((event) => {
+  const sub = usbSerialPort.onReceived((event) => {
     console.log(event.deviceId, event.data);
   });
   // unsubscribe
   // sub.remove();
 
-  await usbSerialport.send('00FF');
+  await usbSerialPort.send('00FF');
   
-  usbSerialport.close();
+  usbSerialPort.close();
 } catch(err) {
   console.log(err);
   if (err.code === Codes.DEVICE_NOT_FOUND) {

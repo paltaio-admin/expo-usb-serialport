@@ -1,4 +1,5 @@
 import { NativeModules } from 'react-native'
+import type { Driver } from './constants'
 
 export interface Device {
   readonly deviceId: number
@@ -6,10 +7,11 @@ export interface Device {
   readonly productId: number
 }
 
-interface UsbSerialportForAndroidAPI {
+interface UsbSerialPortForAndroidAPI {
   list: () => Promise<Device[]>
   // return 1 if already has permission, 0 will request permission
   tryRequestPermission: (deviceId: number) => Promise<number>
+  addDevice: (vendorId: number, productId: number, driver: Driver) => Promise<void>
   hasPermission: (deviceId: number) => Promise<boolean>
   open: (
     deviceId: number,
@@ -27,7 +29,7 @@ interface UsbSerialportForAndroidAPI {
   close: (deviceId: number) => Promise<null>
 }
 
-const UsbSerialportForAndroid: UsbSerialportForAndroidAPI
-  = NativeModules.UsbSerialportForAndroid
+const UsbSerialPortForAndroid: UsbSerialPortForAndroidAPI
+  = NativeModules.UsbSerialPortForAndroid
 
-export default UsbSerialportForAndroid
+export default UsbSerialPortForAndroid

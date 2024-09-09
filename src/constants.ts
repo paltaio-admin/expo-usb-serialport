@@ -10,7 +10,7 @@ export const {
   CODE_SEND_FAILED,
   CODE_READ_FAILED,
   CODE_DEVICE_NOT_OPEN_OR_CLOSED,
-} = NativeModules.UsbSerialportForAndroid.getConstants()
+} = NativeModules.UsbSerialPortForAndroid.getConstants()
 
 export const Codes = {
   DEVICE_NOT_FOUND: CODE_DEVICE_NOT_FOUND,
@@ -31,5 +31,15 @@ export enum Parity {
   Mark,
   Space,
 };
+
+export enum Driver {
+  CDC_ACM = 'cdc-acm',
+  FTDI = 'ftdi',
+  CH34X = 'ch34x',
+  CP21XX = 'cp21xx',
+  CHROME_CCD = 'chrome-ccd',
+  GSM_MODEM = 'gsm-modem',
+  PROLIFIC = 'prolific',
+}
 
 export const DataReceivedEvent = 'usbSerialPortDataReceived'

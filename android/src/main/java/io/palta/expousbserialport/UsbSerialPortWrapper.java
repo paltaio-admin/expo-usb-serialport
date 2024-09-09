@@ -18,11 +18,11 @@ public class UsbSerialPortWrapper implements SerialInputOutputManager.Listener {
 
     private static final String DataReceivedEvent = "usbSerialPortDataReceived";
 
-    private int deviceId;
-    private UsbSerialPort port;
-    private EventSender sender;
+    private final int deviceId;
+    private final UsbSerialPort port;
+    private final EventSender sender;
     private boolean closed = false;
-    private SerialInputOutputManager ioManager;
+    private final SerialInputOutputManager ioManager;
 
     UsbSerialPortWrapper(int deviceId, UsbSerialPort port, EventSender sender) {
         this.deviceId = deviceId;
@@ -55,7 +55,7 @@ public class UsbSerialPortWrapper implements SerialInputOutputManager.Listener {
             int read = this.port.read(buffer, READ_WAIT_MILLIS);
             if (read > 0) {
                 byte[] data = Arrays.copyOf(buffer, read);
-                String hex = UsbSerialportForAndroidModule.bytesToHex(data);
+                String hex = UsbSerialPortForAndroidModule.bytesToHex(data);
                 promise.resolve(hex);
             } else {
                 promise.reject("read_failed", "no response from device");
@@ -67,7 +67,7 @@ public class UsbSerialPortWrapper implements SerialInputOutputManager.Listener {
 
     public void onNewData(byte[] data) {
         WritableMap event = Arguments.createMap();
-        String hex = UsbSerialportForAndroidModule.bytesToHex(data);
+        String hex = UsbSerialPortForAndroidModule.bytesToHex(data);
         event.putInt("deviceId", this.deviceId);
         event.putString("data", hex);
         Log.d("expousbserialport", hex);

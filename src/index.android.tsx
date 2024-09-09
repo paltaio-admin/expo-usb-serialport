@@ -1,14 +1,14 @@
 import { NativeEventEmitter, NativeModules } from 'react-native'
-import UsbSerialportForAndroid, { Device } from './native_module'
+import UsbSerialPortForAndroid, { Device } from './native_module'
 import UsbSerial from './usb_serial'
-import type { Parity } from './constants'
+import type { Driver, Parity } from './constants'
 
 export { Device, UsbSerial }
 export { Codes, DataReceivedEvent, Parity } from './constants'
 export { EventData, Listener } from './usb_serial'
 
 const eventEmitter = new NativeEventEmitter(
-  NativeModules.UsbSerialportForAndroid,
+  NativeModules.UsbSerialPortForAndroid,
 )
 
 export interface OpenOptions {
@@ -29,6 +29,7 @@ export interface Manager {
    * See {@link Codes}
    * @param deviceId
    */
+  addDevice: (vendorId: number, productId: number, driver: Driver) => Promise<void>
   tryRequestPermission: (deviceId: number) => Promise<boolean>
   /**
    * May return error with these codes:
@@ -55,20 +56,24 @@ export interface Manager {
 
 const defaultManager: Manager = {
   list(): Promise<Device[]> {
-    return UsbSerialportForAndroid.list()
+    return UsbSerialPortForAndroid.list()
+  },
+
+  addDevice(vendorId: number, productId: number, driver: Driver): Promise<void> {
+    return UsbSerialPortForAndroid.addDevice(vendorId, productId, driver)
   },
 
   async tryRequestPermission(deviceId: number): Promise<boolean> {
-    const result = await UsbSerialportForAndroid.tryRequestPermission(deviceId)
+    const result = await UsbSerialPortForAndroid.tryRequestPermission(deviceId)
     return result === 1
   },
 
   hasPermission(deviceId: number): Promise<boolean> {
-    return UsbSerialportForAndroid.hasPermission(deviceId)
+    return UsbSerialPortForAndroid.hasPermission(deviceId)
   },
 
   async open(deviceId: number, options: OpenOptions): Promise<UsbSerial> {
-    await UsbSerialportForAndroid.open(
+    await UsbSerialPortForAndroid.open(
       deviceId,
       options.baudRate,
       options.dataBits,

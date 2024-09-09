@@ -1,6 +1,6 @@
 import type { EventEmitter, EventSubscription } from 'react-native'
 import { DataReceivedEvent } from './constants'
-import UsbSerialportForAndroid from './native_module'
+import UsbSerialPortForAndroid from './native_module'
 
 export interface EventData {
   deviceId: number
@@ -33,7 +33,7 @@ export default class UsbSerial {
    * @param hexStr
    */
   send(hexStr: string): Promise<null> {
-    return UsbSerialportForAndroid.send(this.deviceId, hexStr)
+    return UsbSerialPortForAndroid.send(this.deviceId, hexStr)
   }
 
   /**
@@ -48,7 +48,7 @@ export default class UsbSerial {
    * @param hexStr
    */
   sendWithResponse(hexStr: string, bytes: number): Promise<null> {
-    return UsbSerialportForAndroid.sendWithResponse(
+    return UsbSerialPortForAndroid.sendWithResponse(
       this.deviceId,
       hexStr,
       bytes,
@@ -91,6 +91,6 @@ export default class UsbSerial {
     for (const sub of this.subscriptions) {
       sub.remove()
     }
-    return UsbSerialportForAndroid.close(this.deviceId)
+    return UsbSerialPortForAndroid.close(this.deviceId)
   }
 }

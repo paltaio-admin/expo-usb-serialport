@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
 
 export default function App() {
   const [result, setResult] = React.useState<Device[]>([])
-  const usbSerialport = React.useRef<UsbSerial | null>(null)
+  const usbSerialPort = React.useRef<UsbSerial | null>(null)
 
   React.useEffect(() => {
     UsbSerialManager.list().then((devices) => {
@@ -66,7 +66,7 @@ export default function App() {
         title="open"
         onPress={async () => {
           try {
-            usbSerialport.current = await UsbSerialManager.open(2004, {
+            usbSerialPort.current = await UsbSerialManager.open(2004, {
               baudRate: 38400,
               parity: Parity.None,
               dataBits: 8,
@@ -83,7 +83,7 @@ export default function App() {
         title="close"
         onPress={async () => {
           try {
-            await usbSerialport.current?.close()
+            await usbSerialPort.current?.close()
           }
           catch (err) {
             console.log(err)
