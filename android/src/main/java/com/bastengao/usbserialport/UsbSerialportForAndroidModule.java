@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
+import android.os.Build;
 
 import androidx.annotation.NonNull;
 
@@ -116,7 +117,11 @@ public class UsbSerialportForAndroidModule extends ReactContextBaseJavaModule im
         };
 
         IntentFilter filter = new IntentFilter(INTENT_ACTION_GRANT_USB);
-        getCurrentActivity().registerReceiver(usbPermissionReceiver, filter);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            getCurrentActivity().registerReceiver(usbPermissionReceiver, filter, Context.RECEIVER_EXPORTED);
+        } else {
+            getCurrentActivity().registerReceiver(usbPermissionReceiver, filter);
+        }
 
         PendingIntent usbPermissionIntent = PendingIntent.getBroadcast(getCurrentActivity(), 0, new Intent(INTENT_ACTION_GRANT_USB), PendingIntent.FLAG_MUTABLE);
         usbManager.requestPermission(device, usbPermissionIntent);
