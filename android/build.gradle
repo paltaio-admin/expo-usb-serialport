@@ -21,7 +21,7 @@ android {
     namespace = "io.palta.expousbserialport"
     compileSdkVersion safeExtGet('UsbSerialPortForAndroid_compileSdkVersion', 34)
     defaultConfig {
-        minSdkVersion safeExtGet('UsbSerialPortForAndroid_minSdkVersion', 21)
+        minSdkVersion safeExtGet('UsbSerialPortForAndroid_minSdkVersion', 24)
         targetSdkVersion safeExtGet('UsbSerialPortForAndroid_targetSdkVersion', 34)
         versionCode 1
         versionName "1.0"
