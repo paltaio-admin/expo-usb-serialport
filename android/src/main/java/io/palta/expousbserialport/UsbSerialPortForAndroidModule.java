@@ -62,6 +62,14 @@ public class UsbSerialPortForAndroidModule extends ReactContextBaseJavaModule im
         usbEventReceiver.addListener();
     }
 
+    @ReactMethod
+    public void addListener(String eventName) {
+    }
+
+    @ReactMethod
+    public void removeListeners(Integer count) {
+    }
+
     @Override
     public void onCatalystInstanceDestroy() {
         super.onCatalystInstanceDestroy();
