@@ -48,89 +48,24 @@ public class UsbSerialPortForAndroidModule extends ReactContextBaseJavaModule im
     public static final String CODE_DEVICE_NOT_OPEN_OR_CLOSED = "device_not_open_or_closed";
 
     private final ReactApplicationContext reactContext;
-    private final Map<Integer, UsbSerialPortWrapper> usbSerialPorts = new HashMap<Integer, UsbSerialPortWrapper>();
+    private final Map<Integer, UsbSerialPortWrapper> usbSerialPorts = new HashMap<>();
 
     public final CustomProber customProber = new CustomProber();
 
-    private final Map<String, Integer> listenerCounts = new HashMap<>();
-    private final Map<String, Boolean> isListeningMap = new HashMap<>();
-
-    @ReactMethod
-    public void addListener(String eventName) {
-        int count = Objects.requireNonNullElse(listenerCounts.get(eventName), 0);
-
-        listenerCounts.put(eventName, count + 1);
-
-        if (count == 0 && (eventName.equals("usbAttached") || eventName.equals("usbDetached"))) {
-            startUsbListening();
-        }
-    }
-
-    @ReactMethod
-    public void removeListeners(String eventName, Integer count) {
-        int currentCount = Objects.requireNonNullElse(listenerCounts.get(eventName), 0);
-        int newCount = Math.max(0, currentCount - (count != null ? count : 1));
-
-        if (newCount == 0) {
-            listenerCounts.remove(eventName);
-        } else {
-            listenerCounts.put(eventName, newCount);
-        }
-
-        if (listenerCounts.isEmpty() ||
-            (Objects.requireNonNullElse(listenerCounts.get("usbAttached"), 0) == 0 &&
-                Objects.requireNonNullElse(listenerCounts.get("usbDetached"), 0) == 0)) {
-            stopUsbListening();
-        }
-    }
-
-    private void startUsbListening() {
-        if (Boolean.FALSE.equals(isListeningMap.getOrDefault("usb", Boolean.FALSE))) {
-            IntentFilter filter = new IntentFilter();
-            filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
-            filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
-            reactContext.registerReceiver(usbReceiver, filter);
-            isListeningMap.put("usb", true);
-        }
-    }
-
-    private void stopUsbListening() {
-        if (Boolean.TRUE.equals(isListeningMap.getOrDefault("usb", Boolean.FALSE))) {
-            reactContext.unregisterReceiver(usbReceiver);
-            isListeningMap.put("usb", false);
-        }
-    }
-
-    private final BroadcastReceiver usbReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-
-            if (device != null) {
-                WritableMap params = Arguments.createMap();
-                params.putInt("deviceId", device.getDeviceId());
-                params.putInt("vendorId", device.getVendorId());
-                params.putInt("productId", device.getProductId());
-
-                if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
-                    sendEvent("usbAttached", params);
-                } else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
-                    sendEvent("usbDetached", params);
-                }
-            }
-        }
-    };
+    private final UsbEventReceiver usbEventReceiver;
 
     public UsbSerialPortForAndroidModule(ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
+        this.usbEventReceiver = new UsbEventReceiver();
+        usbEventReceiver.initialize(reactContext, this);
+        usbEventReceiver.addListener();
     }
 
     @Override
     public void onCatalystInstanceDestroy() {
         super.onCatalystInstanceDestroy();
-        reactContext.unregisterReceiver(usbReceiver);
+        usbEventReceiver.removeListener();
     }
 
     @Override
