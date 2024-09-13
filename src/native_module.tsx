@@ -12,6 +12,8 @@ interface UsbSerialPortForAndroidAPI {
   // return 1 if already has permission, 0 will request permission
   tryRequestPermission: (deviceId: number) => Promise<number>
   addDevice: (vendorId: number, productId: number, driver: Driver) => Promise<void>
+  addListener: (eventName: string) => void
+  removeListeners: (eventName: string, count: number) => void
   hasPermission: (deviceId: number) => Promise<boolean>
   open: (
     deviceId: number,

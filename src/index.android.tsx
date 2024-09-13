@@ -30,6 +30,8 @@ export interface Manager {
    * @param deviceId
    */
   addDevice: (vendorId: number, productId: number, driver: Driver) => Promise<void>
+  addListener: (eventName: string) => void
+  removeListeners: (eventName: string, count: number) => void
   tryRequestPermission: (deviceId: number) => Promise<boolean>
   /**
    * May return error with these codes:
@@ -61,6 +63,14 @@ const defaultManager: Manager = {
 
   addDevice(vendorId: number, productId: number, driver: Driver): Promise<void> {
     return UsbSerialPortForAndroid.addDevice(vendorId, productId, driver)
+  },
+
+  addListener(eventName: string) {
+    UsbSerialPortForAndroid.addListener(eventName)
+  },
+
+  removeListeners(eventName: string, count: number) {
+    UsbSerialPortForAndroid.removeListeners(eventName, count)
   },
 
   async tryRequestPermission(deviceId: number): Promise<boolean> {

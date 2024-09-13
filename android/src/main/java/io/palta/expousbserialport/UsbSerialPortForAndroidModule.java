@@ -52,9 +52,85 @@ public class UsbSerialPortForAndroidModule extends ReactContextBaseJavaModule im
 
     public final CustomProber customProber = new CustomProber();
 
+    private final Map<String, Integer> listenerCounts = new HashMap<>();
+    private final Map<String, Boolean> isListeningMap = new HashMap<>();
+
+    @ReactMethod
+    public void addListener(String eventName) {
+        int count = Objects.requireNonNullElse(listenerCounts.get(eventName), 0);
+
+        listenerCounts.put(eventName, count + 1);
+
+        if (count == 0 && (eventName.equals("usbAttached") || eventName.equals("usbDetached"))) {
+            startUsbListening();
+        }
+    }
+
+    @ReactMethod
+    public void removeListeners(String eventName, Integer count) {
+        int currentCount = Objects.requireNonNullElse(listenerCounts.get(eventName), 0);
+        int newCount = Math.max(0, currentCount - (count != null ? count : 1));
+
+        if (newCount == 0) {
+            listenerCounts.remove(eventName);
+        } else {
+            listenerCounts.put(eventName, newCount);
+        }
+
+        if (listenerCounts.isEmpty() ||
+            (Objects.requireNonNullElse(listenerCounts.get("usbAttached"), 0) == 0 &&
+                Objects.requireNonNullElse(listenerCounts.get("usbDetached"), 0) == 0)) {
+            stopUsbListening();
+        }
+    }
+
+    private void startUsbListening() {
+        if (Boolean.FALSE.equals(isListeningMap.getOrDefault("usb", Boolean.FALSE))) {
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
+            filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
+            reactContext.registerReceiver(usbReceiver, filter);
+            isListeningMap.put("usb", true);
+        }
+    }
+
+    private void stopUsbListening() {
+        if (Boolean.TRUE.equals(isListeningMap.getOrDefault("usb", Boolean.FALSE))) {
+            reactContext.unregisterReceiver(usbReceiver);
+            isListeningMap.put("usb", false);
+        }
+    }
+
+    private final BroadcastReceiver usbReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+
+            if (device != null) {
+                WritableMap params = Arguments.createMap();
+                params.putInt("deviceId", device.getDeviceId());
+                params.putInt("vendorId", device.getVendorId());
+                params.putInt("productId", device.getProductId());
+
+                if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
+                    sendEvent("usbAttached", params);
+                } else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
+                    sendEvent("usbDetached", params);
+                }
+            }
+        }
+    };
+
     public UsbSerialPortForAndroidModule(ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
+    }
+
+    @Override
+    public void onCatalystInstanceDestroy() {
+        super.onCatalystInstanceDestroy();
+        reactContext.unregisterReceiver(usbReceiver);
     }
 
     @Override
@@ -135,10 +211,8 @@ public class UsbSerialPortForAndroidModule extends ReactContextBaseJavaModule im
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             usbPermissionIntent = PendingIntent.getBroadcast(getCurrentActivity(), 0, usbIntent, PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_ALLOW_UNSAFE_IMPLICIT_INTENT);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            usbPermissionIntent = PendingIntent.getBroadcast(getCurrentActivity(), 0, usbIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         } else {
-            usbPermissionIntent = PendingIntent.getBroadcast(getCurrentActivity(), 0, usbIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            usbPermissionIntent = PendingIntent.getBroadcast(getCurrentActivity(), 0, usbIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         }
 
         usbManager.requestPermission(device, usbPermissionIntent);
@@ -154,7 +228,6 @@ public class UsbSerialPortForAndroidModule extends ReactContextBaseJavaModule im
         }
 
         promise.resolve(usbManager.hasPermission(device));
-        return;
     }
 
     @ReactMethod
@@ -266,14 +339,9 @@ public class UsbSerialPortForAndroidModule extends ReactContextBaseJavaModule im
         promise.resolve(null);
     }
 
-    public void sendEvent(final String eventName, final WritableMap event) {
-        reactContext.runOnUiQueueThread(new Runnable() {
-            @Override
-            public void run() {
-                reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                    .emit(eventName, event);
-            }
-        });
+    public void sendEvent(String eventName, WritableMap params) {
+        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+            .emit(eventName, params);
     }
 
     private UsbDevice findDevice(int deviceId) {
