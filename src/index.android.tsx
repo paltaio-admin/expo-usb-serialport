@@ -88,8 +88,8 @@ const defaultManager: Manager = {
     return UsbSerialPortForAndroid.getPortInfo(deviceId)
   },
 
-  setPortDtrRts(deviceId: number, dtr: boolean, rts: boolean) {
-    return UsbSerialPortForAndroid.setPortDtrRts(deviceId, dtr, rts)
+  setPortDtrRts(deviceId: number, opts: { dtr: boolean, rts: boolean }) {
+    return UsbSerialPortForAndroid.setPortDtrRts(deviceId, opts)
   },
 
   async open(deviceId: number, options: OpenOptions): Promise<UsbSerial> {
