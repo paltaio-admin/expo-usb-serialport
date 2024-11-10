@@ -10,9 +10,6 @@ export interface Device {
 export interface PortInfo {
   readonly dtr: boolean
   readonly rts: boolean
-  readonly dsr: boolean
-  readonly cts: boolean
-  readonly cd: boolean
 }
 
 interface UsbSerialPortForAndroidAPI {

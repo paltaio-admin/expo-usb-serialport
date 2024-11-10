@@ -204,9 +204,6 @@ public class UsbSerialPortForAndroidModule extends ReactContextBaseJavaModule im
         try {
             WritableMap portInfo = Arguments.createMap();
             portInfo.putBoolean("dtr", port.getDTR());
-            portInfo.putBoolean("dsr", port.getDSR());
-            portInfo.putBoolean("cts", port.getCTS());
-            portInfo.putBoolean("cd", port.getCD());
             portInfo.putBoolean("rts", port.getRTS());
             promise.resolve(portInfo);
         } catch (IOException e) {
