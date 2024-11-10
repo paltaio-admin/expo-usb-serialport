@@ -188,7 +188,7 @@ public class UsbSerialPortForAndroidModule extends ReactContextBaseJavaModule im
     }
 
     @ReactMethod
-    public void getPortInfo(int deviceId, Promise promise) {
+    public void getDtrRts(int deviceId, Promise promise) {
         UsbSerialPort port = getPort(deviceId);
         if (port == null) {
             promise.reject(CODE_DEVICE_NOT_FOUND, "device not found");
@@ -206,7 +206,7 @@ public class UsbSerialPortForAndroidModule extends ReactContextBaseJavaModule im
     }
 
     @ReactMethod
-    public void setPortDtrRts(int deviceId, ReadableMap opts, Promise promise) {
+    public void setDtrRts(int deviceId, ReadableMap opts, Promise promise) {
         boolean dtr = opts.getBoolean("dtr");
         boolean rts = opts.getBoolean("rts");
 

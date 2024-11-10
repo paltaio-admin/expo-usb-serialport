@@ -34,8 +34,8 @@ interface UsbSerialPortForAndroidAPI {
     bytes: number
   ) => Promise<null>
   close: (deviceId: number) => Promise<null>
-  getPortInfo: (deviceId: number) => Promise<PortInfo | null>
-  setPortDtrRts: (deviceId: number, opts: { dtr: boolean, rts: boolean }) => Promise<boolean>
+  getDtrRts: (deviceId: number) => Promise<PortInfo | null>
+  setDtrRts: (deviceId: number, opts: { dtr: boolean, rts: boolean }) => Promise<boolean>
 }
 
 const UsbSerialPortForAndroid: UsbSerialPortForAndroidAPI

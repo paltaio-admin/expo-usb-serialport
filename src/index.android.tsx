@@ -54,8 +54,8 @@ export interface Manager {
    * @param options
    */
   open: (deviceId: number, options: OpenOptions) => Promise<UsbSerial>
-  getPortInfo: (deviceId: number) => Promise<PortInfo | null>
-  setPortDtrRts: (deviceId: number, opts: { dtr: boolean, rts: boolean }) => Promise<boolean>
+  getDtrRts: (deviceId: number) => Promise<PortInfo | null>
+  setDtrRts: (deviceId: number, opts: { dtr: boolean, rts: boolean }) => Promise<boolean>
 }
 
 const defaultManager: Manager = {
@@ -84,12 +84,12 @@ const defaultManager: Manager = {
     return UsbSerialPortForAndroid.hasPermission(deviceId)
   },
 
-  getPortInfo(deviceId: number) {
-    return UsbSerialPortForAndroid.getPortInfo(deviceId)
+  getDtrRts(deviceId: number) {
+    return UsbSerialPortForAndroid.getDtrRts(deviceId)
   },
 
-  setPortDtrRts(deviceId: number, opts: { dtr: boolean, rts: boolean }) {
-    return UsbSerialPortForAndroid.setPortDtrRts(deviceId, opts)
+  setDtrRts(deviceId: number, opts: { dtr: boolean, rts: boolean }) {
+    return UsbSerialPortForAndroid.setDtrRts(deviceId, opts)
   },
 
   async open(deviceId: number, options: OpenOptions): Promise<UsbSerial> {
