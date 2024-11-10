@@ -17,7 +17,7 @@
   ],
   "main": "lib/commonjs/index.android",
   "module": "lib/module/index.android",
-  "types": "lib/typescript/src/index.android.d.ts",
+  "types": "lib/typescript/index.android.d.ts",
   "react-native": "src/index.android",
   "source": "src/index.android",
   "files": [
