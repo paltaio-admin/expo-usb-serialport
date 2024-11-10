@@ -1,5 +1,5 @@
 import { NativeEventEmitter, NativeModules } from 'react-native'
-import UsbSerialPortForAndroid, { Device } from './native_module'
+import UsbSerialPortForAndroid, { Device, PortInfo } from './native_module'
 import UsbSerial from './usb_serial'
 import type { Driver, Parity } from './constants'
 
@@ -54,6 +54,8 @@ export interface Manager {
    * @param options
    */
   open: (deviceId: number, options: OpenOptions) => Promise<UsbSerial>
+  getPortInfo: (deviceId: number) => Promise<PortInfo | null>
+  setPortDtrRts: (deviceId: number, opts: { dtr: boolean, rts: boolean }) => Promise<boolean>
 }
 
 const defaultManager: Manager = {
@@ -80,6 +82,14 @@ const defaultManager: Manager = {
 
   hasPermission(deviceId: number): Promise<boolean> {
     return UsbSerialPortForAndroid.hasPermission(deviceId)
+  },
+
+  getPortInfo(deviceId: number) {
+    return UsbSerialPortForAndroid.getPortInfo(deviceId)
+  },
+
+  setPortDtrRts(deviceId: number, dtr: boolean, rts: boolean) {
+    return UsbSerialPortForAndroid.setPortDtrRts(deviceId, dtr, rts)
   },
 
   async open(deviceId: number, options: OpenOptions): Promise<UsbSerial> {

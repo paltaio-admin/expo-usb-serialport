@@ -7,6 +7,14 @@ export interface Device {
   readonly productId: number
 }
 
+export interface PortInfo {
+  readonly dtr: boolean
+  readonly rts: boolean
+  readonly dsr: boolean
+  readonly cts: boolean
+  readonly cd: boolean
+}
+
 interface UsbSerialPortForAndroidAPI {
   list: () => Promise<Device[]>
   // return 1 if already has permission, 0 will request permission
@@ -29,6 +37,8 @@ interface UsbSerialPortForAndroidAPI {
     bytes: number
   ) => Promise<null>
   close: (deviceId: number) => Promise<null>
+  getPortInfo: (deviceId: number) => Promise<PortInfo | null>
+  setPortDtrRts: (deviceId: number, opts: { dtr: boolean, rts: boolean }) => Promise<boolean>
 }
 
 const UsbSerialPortForAndroid: UsbSerialPortForAndroidAPI

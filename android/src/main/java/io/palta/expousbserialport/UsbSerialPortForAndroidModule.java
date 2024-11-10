@@ -19,6 +19,7 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.module.annotations.ReactModule;
@@ -176,6 +177,59 @@ public class UsbSerialPortForAndroidModule extends ReactContextBaseJavaModule im
     @ReactMethod
     public void addDevice(int vendorId, int productId, String driverName) {
         customProber.addProduct(vendorId, productId, driverName);
+    }
+
+    private UsbSerialPort getPort(int deviceId, Promise promise) {
+        UsbDevice device = findDevice(deviceId);
+        if (device == null) {
+            promise.reject(CODE_DEVICE_NOT_FOUND, "device not found");
+            return null;
+        }
+        UsbSerialDriver driver = UsbSerialProber.getDefaultProber().probeDevice(device);
+        return driver.getPorts().get(0);
+    }
+
+    @ReactMethod
+    public void getPortInfo(int deviceId, Promise promise) {
+        UsbSerialPort port = getPort(deviceId, promise);
+        if (port == null) {
+            promise.resolve(null);
+            return;
+        }
+
+        try {
+            WritableMap portInfo = Arguments.createMap();
+            portInfo.putBoolean("dtr", port.getDTR());
+            portInfo.putBoolean("dsr", port.getDSR());
+            portInfo.putBoolean("cts", port.getCTS());
+            portInfo.putBoolean("cd", port.getCD());
+            portInfo.putBoolean("rts", port.getRTS());
+            promise.resolve(portInfo);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        promise.resolve(null);
+    }
+
+    @ReactMethod
+    public void setPortDtrRts(int deviceId, ReadableMap opts, Promise promise) {
+        boolean dtr = opts.getBoolean("dtr");
+        boolean rts = opts.getBoolean("rts");
+
+        UsbSerialPort port = getPort(deviceId, promise);
+        if (port == null) {
+            promise.resolve(null);
+            return;
+        }
+
+        try {
+            port.setDTR(dtr);
+            port.setRTS(rts);
+            promise.resolve(true);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @ReactMethod

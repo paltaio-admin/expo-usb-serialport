@@ -91,8 +91,7 @@ public class UsbSerialPortWrapper implements SerialInputOutputManager.Listener {
         this.closed = true;
         try {
             port.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ignored) {
         }
     }
 }
