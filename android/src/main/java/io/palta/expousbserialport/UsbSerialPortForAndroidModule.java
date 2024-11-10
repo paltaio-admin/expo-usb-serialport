@@ -179,21 +179,25 @@ public class UsbSerialPortForAndroidModule extends ReactContextBaseJavaModule im
         customProber.addProduct(vendorId, productId, driverName);
     }
 
-    private UsbSerialPort getPort(int deviceId, Promise promise) {
+    private UsbSerialPort getPort(int deviceId) {
         UsbDevice device = findDevice(deviceId);
         if (device == null) {
-            promise.reject(CODE_DEVICE_NOT_FOUND, "device not found");
             return null;
         }
+
         UsbSerialDriver driver = UsbSerialProber.getDefaultProber().probeDevice(device);
+        if (driver == null) {
+            driver = customProber.getCustomProber().probeDevice(device);
+        }
+
         return driver.getPorts().get(0);
     }
 
     @ReactMethod
     public void getPortInfo(int deviceId, Promise promise) {
-        UsbSerialPort port = getPort(deviceId, promise);
+        UsbSerialPort port = getPort(deviceId);
         if (port == null) {
-            promise.resolve(null);
+            promise.reject(CODE_DEVICE_NOT_FOUND, "device not found");
             return;
         }
 
@@ -217,9 +221,10 @@ public class UsbSerialPortForAndroidModule extends ReactContextBaseJavaModule im
         boolean dtr = opts.getBoolean("dtr");
         boolean rts = opts.getBoolean("rts");
 
-        UsbSerialPort port = getPort(deviceId, promise);
+        UsbSerialPort port = getPort(deviceId);
+
         if (port == null) {
-            promise.resolve(null);
+            promise.reject(CODE_DEVICE_NOT_OPEN_OR_CLOSED, "Serial port not open or closed");
             return;
         }
 
@@ -228,7 +233,7 @@ public class UsbSerialPortForAndroidModule extends ReactContextBaseJavaModule im
             port.setRTS(rts);
             promise.resolve(true);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            promise.reject("SET_DTR_RTS_FAILED", e.getMessage());
         }
     }
 
