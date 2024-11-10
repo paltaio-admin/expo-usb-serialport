@@ -32,6 +32,11 @@ public class UsbSerialPortWrapper implements SerialInputOutputManager.Listener {
         ioManager.start();
     }
 
+    // Add this getter method
+    public UsbSerialPort getPort() {
+        return this.port;
+    }
+
     public interface EventCallback {
         void onComplete(Exception e);
     }
@@ -65,6 +70,7 @@ public class UsbSerialPortWrapper implements SerialInputOutputManager.Listener {
         }
     }
 
+    @Override
     public void onNewData(byte[] data) {
         WritableMap event = Arguments.createMap();
         String hex = UsbSerialPortForAndroidModule.bytesToHex(data);
@@ -74,6 +80,7 @@ public class UsbSerialPortWrapper implements SerialInputOutputManager.Listener {
         sender.sendEvent(DataReceivedEvent, event);
     }
 
+    @Override
     public void onRunError(Exception e) {
         // TODO: implement
     }

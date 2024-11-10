@@ -180,17 +180,11 @@ public class UsbSerialPortForAndroidModule extends ReactContextBaseJavaModule im
     }
 
     private UsbSerialPort getPort(int deviceId) {
-        UsbDevice device = findDevice(deviceId);
-        if (device == null) {
-            return null;
+        UsbSerialPortWrapper wrapper = usbSerialPorts.get(deviceId);
+        if (wrapper != null) {
+            return wrapper.getPort();
         }
-
-        UsbSerialDriver driver = UsbSerialProber.getDefaultProber().probeDevice(device);
-        if (driver == null) {
-            driver = customProber.getCustomProber().probeDevice(device);
-        }
-
-        return driver.getPorts().get(0);
+        return null;
     }
 
     @ReactMethod
@@ -207,10 +201,8 @@ public class UsbSerialPortForAndroidModule extends ReactContextBaseJavaModule im
             portInfo.putBoolean("rts", port.getRTS());
             promise.resolve(portInfo);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            promise.reject("GET_PORT_INFO_FAILED", e.getMessage());
         }
-
-        promise.resolve(null);
     }
 
     @ReactMethod
@@ -226,6 +218,10 @@ public class UsbSerialPortForAndroidModule extends ReactContextBaseJavaModule im
         }
 
         try {
+            if (!port.isOpen()) {
+                promise.reject(CODE_DEVICE_NOT_OPEN_OR_CLOSED, "Serial port is not open");
+                return;
+            }
             port.setDTR(dtr);
             port.setRTS(rts);
             promise.resolve(true);
